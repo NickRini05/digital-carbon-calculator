@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Carbon Footprint Analysis - Professional Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --bg-color: #0f1416;
+            --panel-bg: linear-gradient(145deg, #1e262b, #151b1e);
+            --card-bg: linear-gradient(145deg, #232d33, #1a2125);
+            --primary-green: #5cb85c;
+            --primary-glow: rgba(92, 184, 92, 0.2);
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --accent-orange: #f0ad4e;
+            --modal-overlay: rgba(0, 0, 0, 0.85);
+        }
+
+        body {
+            font-family: 'Geist', 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(92, 184, 92, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(54, 162, 235, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 0%, #1e293b 0%, #0f1416 100%);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 12px;
+            width: 100%;
+            max-width: 1400px;
+        }
+
+        .header-top h1 {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin: 0;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 360px 1fr 1fr;
+            gap: 15px;
+            max-width: 1400px;
+            width: 100%;
+            align-items: stretch;
+        }
+
+        .panel {
+            background: rgba(30, 38, 43, 0.4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid rgba(92, 184, 92, 0.15);
+            box-shadow: 
+                0 8px 32px 0 rgba(31, 38, 135, 0.15),
+                inset 0 1px 1px 0 rgba(255, 255, 255, 0.02);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .panel:hover {
+            border-color: rgba(92, 184, 92, 0.3);
+            box-shadow: 
+                0 12px 40px 0 rgba(92, 184, 92, 0.2),
+                inset 0 1px 1px 0 rgba(255, 255, 255, 0.04);
+        }
+
+        h2 {
+            font-size: 13px;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Input Controls */
+        .form-group { margin-bottom: 4px; }
+        .label-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+
+        .info-btn {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-muted);
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+
+        .info-btn:hover { background: var(--primary-green); color: white; }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            background-color: #0f172a;
+            color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 12px;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(to bottom, #74c974, #4cae4c);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 
+                0 4px 12px var(--primary-glow),
+                inset 0 1px 1px 0 rgba(255, 255, 255, 0.2);
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 6px 20px var(--primary-glow),
+                inset 0 1px 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Results Display */
+        .card {
+            background: rgba(35, 45, 51, 0.3);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(92, 184, 92, 0.1);
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: 
+                0 4px 16px 0 rgba(0, 0, 0, 0.2),
+                inset 0 1px 1px 0 rgba(92, 184, 92, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(92, 184, 92, 0.2);
+            box-shadow: 
+                0 6px 24px 0 rgba(92, 184, 92, 0.15),
+                inset 0 1px 1px 0 rgba(92, 184, 92, 0.1);
+        }
+
+        .total-number {
+            font-size: 42px;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            margin: 8px 0;
+            background: linear-gradient(to bottom, #fff, #5cb85c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .chart-container { height: 170px; width: 100%; position: relative; }
+
+        /* Modal Layout */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: var(--modal-overlay);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #1e293b;
+            padding: 30px;
+            border: 1px solid var(--primary-green);
+            border-radius: 16px;
+            max-width: 420px;
+            position: relative;
+        }
+
+        .close-btn { position: absolute; top: 15px; right: 20px; cursor: pointer; color: var(--text-muted); font-size: 22px; }
+
+        .insight-header { color: var(--primary-green); font-weight: 700; font-size: 11px; text-transform: uppercase; margin-bottom: 5px; }
+        .insight-text { font-size: 12px; line-height: 1.5; color: #cbd5e1; margin-bottom: 12px; }
+
+        /* Light Mode Toggle */
+        .theme-toggle {
+            width: 50px;
+            height: 26px;
+            background: rgba(45, 55, 72, 0.3);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(92, 184, 92, 0.2);
+            border-radius: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 2px;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-toggle:hover {
+            border-color: rgba(92, 184, 92, 0.4);
+            box-shadow: 0 6px 16px rgba(92, 184, 92, 0.15);
+        }
+
+        .theme-toggle.light {
+            background: rgba(252, 211, 77, 0.3);
+            border-color: rgba(252, 211, 77, 0.4);
+        }
+
+        /* Share Button */
+        .share-button {
+            width: 50px;
+            height: 26px;
+            background: rgba(45, 55, 72, 0.3);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(92, 184, 92, 0.2);
+            border-radius: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .share-button:hover {
+            border-color: rgba(92, 184, 92, 0.4);
+            box-shadow: 0 6px 16px rgba(92, 184, 92, 0.15);
+            transform: scale(1.05);
+        }
+
+        .share-button-icon {
+            font-size: 14px;
+        }
+
+        .theme-toggle-circle {
+            width: 22px;
+            height: 22px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .theme-toggle.light .theme-toggle-circle {
+            transform: translateX(24px);
+        }
+
+        .theme-toggle.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        /* Light Mode Variables */
+        :root.light-mode {
+            --bg-color: #f5f5f5;
+            --panel-bg: linear-gradient(145deg, #ffffff, #f9f9f9);
+            --card-bg: linear-gradient(145deg, #fafafa, #f5f5f5);
+            --text-main: #1a1a1a;
+            --text-muted: #666666;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --modal-overlay: rgba(0, 0, 0, 0.5);
+        }
+
+        :root.light-mode .modal-content {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+        }
+
+        :root.light-mode select {
+            background-color: #ffffff;
+            color: #1a1a1a;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23666666'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+        }
+
+        :root.light-mode .header-top h1 {
+            background: linear-gradient(to right, #000000, #333333);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        :root.light-mode body {
+            background-color: #f5f5f5;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(92, 184, 92, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(54, 162, 235, 0.08) 0%, transparent 50%),
+                linear-gradient(135deg, #f0f0f0 0%, #ffffff 100%);
+        }
+
+        :root.light-mode .panel {
+            background: rgba(255, 255, 255, 0.5);
+            border-color: rgba(92, 184, 92, 0.2);
+            box-shadow: 
+                0 8px 32px 0 rgba(31, 38, 135, 0.08),
+                inset 0 1px 1px 0 rgba(255, 255, 255, 0.8);
+        }
+
+        :root.light-mode .panel:hover {
+            border-color: rgba(92, 184, 92, 0.4);
+            box-shadow: 
+                0 12px 40px 0 rgba(92, 184, 92, 0.12),
+                inset 0 1px 1px 0 rgba(255, 255, 255, 0.9);
+        }
+
+        :root.light-mode .card {
+            background: rgba(255, 255, 255, 0.4);
+            border-color: rgba(92, 184, 92, 0.15);
+            box-shadow: 
+                0 4px 16px 0 rgba(0, 0, 0, 0.08),
+                inset 0 1px 1px 0 rgba(255, 255, 255, 0.9);
+        }
+
+        :root.light-mode .card:hover {
+            border-color: rgba(92, 184, 92, 0.25);
+            box-shadow: 
+                0 6px 24px 0 rgba(92, 184, 92, 0.1),
+                inset 0 1px 1px 0 rgba(255, 255, 255, 0.95);
+        }
+
+        :root.light-mode .insight-text {
+            color: #1a1a1a;
+        }
+
+        :root.light-mode .info-btn {
+            color: #000000;
+        }
+
+        :root.light-mode #modalText {
+            color: #1a1a1a !important;
+        }
+
+        /* Tab Navigation */
+        .tab-navigation {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 5px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .tab-button {
+            padding: 10px 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px 8px 0 0;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tab-button:hover {
+            background: rgba(92, 184, 92, 0.1);
+            color: var(--primary-green);
+        }
+
+        .tab-button.active {
+            background: var(--primary-green);
+            color: white;
+            border-color: var(--primary-green);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Leaderboard Modal Styling */
+        #leaderboardModal .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+        }
+
+        #leaderboardModal input {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+
+        #leaderboardModal input::placeholder {
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div id="modalTitle" style="color: var(--primary-green); font-weight: 700; margin-bottom: 10px; font-size: 18px;">Info</div>
+            <div id="modalText" style="line-height: 1.5; color: #cbd5e1; font-size: 14px;">Context description here.</div>
+        </div>
+    </div>
+
+    <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+        <div class="theme-toggle-circle">🌙</div>
+    </div>
+
+    <div class="share-button" id="shareButton" onclick="openQRModal()" style="position: fixed; top: 18px; right: 80px; z-index: 1000;">
+        <div class="share-button-icon">Share</div>
+    </div>
+
+    <div id="qrModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <span class="close-btn" onclick="closeQRModal()">&times;</span>
+            <div style="color: var(--primary-green); font-weight: 700; margin-bottom: 15px; font-size: 18px;">Share Calculator</div>
+            <div style="text-align: center;">
+                <div id="qrCodeContainer" style="margin-bottom: 15px; background: white; padding: 15px; border-radius: 8px; display: flex; justify-content: center; align-items: center; min-height: 200px;"></div>
+                <p style="color: var(--text-muted); font-size: 12px; margin-top: 10px;">Scan this QR code to share the calculator with others</p>
+            </div>
+        </div>
+    </div>
+
+    <div style="width: 100%; max-width: 1400px;">
+        <div class="header-top">
+            <div style="background: var(--primary-green); width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 16px;">🌱</div>
+            <h1>DIGITAL CARBON FOOTPRINT Calculator</h1>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="tab-button active" onclick="showTab('calculator')">Calculator</button>
+            <button class="tab-button" onclick="showTab('author')">About</button>
+            <button class="tab-button" onclick="showTab('references')">References</button>
+        </div>
+
+        <!-- Tab Content -->
+        <div id="calculator-tab" class="tab-content active">
+        <div class="dashboard-container">
+            <div class="panel">
+                <h2>Usage Configuration</h2>
+                
+                <div class="form-group">
+                    <div class="label-container"><label>💻 Devices Owned</label><span class="info-btn" onclick="openModal('devices')">i</span></div>
+                    <select id="devices">
+                        <option value="5">Laptop, Smartphone, Tablet</option>
+                        <option value="3">Laptop, Smartphone</option>
+                        <option value="2">Smartphone Only</option>
+                        <option value="8">Full Workstation + Mobile</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <div class="label-container"><label>⏱️ Avg Daily Usage (Hrs)</label><span class="info-btn" onclick="openModal('usage')">i</span></div>
+                    <select id="dailyUsage">
+                        <option value="3">2-4 Hours</option>
+                        <option value="5">4-6 Hours</option>
+                        <option value="7">6-8 Hours</option>
+                        <option value="9">8-10 Hours</option>
+                        <option value="12">>10 Hours</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <div class="label-container"><label>🌐 Internet Activity Type</label><span class="info-btn" onclick="openModal('activity')">i</span></div>
+                    <select id="activity">
+                        <option value="4">Mixed (Social, Stream, Game)</option>
+                        <option value="2">Mostly Browsing / Social</option>
+                        <option value="7">Heavy Gaming / Streaming</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <div class="label-container"><label>🎥 Video Stream Quality</label><span class="info-btn" onclick="openModal('quality')">i</span></div>
+                    <select id="quality">
+                        <option value="1">SD (720p)</option>
+                        <option value="3">HD (1080p)</option>
+                        <option value="7">4K (UHD)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <div class="label-container"><label>▶️ Weekly Stream Hours</label><span class="info-btn" onclick="openModal('streamHours')">i</span></div>
+                    <select id="streamHours">
+                        <option value="7">5-10 Hours</option>
+                        <option value="15">10-20 Hours</option>
+                        <option value="25">20-30 Hours</option>
+                        <option value="35">>30 Hours</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <div class="label-container"><label>☁️ Cloud Storage Usage</label><span class="info-btn" onclick="openModal('cloud')">i</span></div>
+                    <select id="cloud">
+                        <option value="1"><50GB</option>
+                        <option value="3">50-200GB</option>
+                        <option value="6">200GB-1TB</option>
+                        <option value="10">>1TB</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <div class="label-container"><label>✉️ Daily Emails Recieved</label><span class="info-btn" onclick="openModal('emails')">i</span></div>
+                    <select id="emails">
+                        <option value="0.5"><20</option>
+                        <option value="1">20-50</option>
+                        <option value="2">50-100</option>
+                        <option value="4">>100</option>
+                    </select>
+                </div>
+                
+                <button onclick="calculateFootprint()">CALCULATE</button>
+            </div>
+
+            <div class="panel">
+                <h2>Analytical Summaries</h2>
+                <div class="card">
+                    <div style="color: var(--text-muted); font-size: 10px; font-weight: 700; text-transform: uppercase;">Estimated Total Annual CO2</div>
+                    <div class="total-number"><span id="totalNumber">0.0</span> <span style="font-size: 16px; font-weight: 400; color: var(--text-muted); -webkit-text-fill-color: initial;">kg/yr</span></div>
+                    <div style="color: var(--text-muted); font-size: 21px; margin-top: 12px; line-height: 1.4;">Equivalent to <span id="drivingMiles" style="color: var(--primary-green); font-weight: 700;">0</span> miles driven by car</div>
+                </div>
+                <div class="card">
+                    <div class="chart-container"><canvas id="donutChart"></canvas></div>
+                </div>
+                <div class="card">
+                    <div class="chart-container"><canvas id="comparisonChart"></canvas></div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>Strategic Insights</h2>
+                <div class="card">
+                    <div class="insight-header">System Assessment:</div>
+                    <div id="totalInsight" class="insight-text">Awaiting data for analysis.</div>
+                    <div style="color: var(--accent-orange); font-weight: 700; font-size: 11px; text-transform: uppercase; margin-bottom: 5px;">Primary Action:</div>
+                    <div id="totalImprove" class="insight-text">Load parameters to view strategy.</div>
+                </div>
+                <div class="card">
+                    <div class="insight-header">Impact Driver Analysis:</div>
+                    <div id="breakdownInsight" class="insight-text">Analyzing segments...</div>
+                    <div style="color: var(--accent-orange); font-weight: 700; font-size: 11px; text-transform: uppercase; margin-bottom: 5px;">Optimization Point:</div>
+                    <div id="breakdownImprove" class="insight-text">Processing efficiency points.</div>
+                </div>
+                <div class="card">
+                    <div class="insight-header">Global Benchmark Ranking:</div>
+                    <div id="compareInsight" class="insight-text">Calculating rank position...</div>
+                </div>
+                <div class="card">
+                    <div class="insight-header">Leaderboard</div>
+                    <div id="leaderboardPreview" class="insight-text">No entries yet</div>
+                    <button onclick="openLeaderboardModal()" style="margin-top: 8px; padding: 6px 12px; background: var(--primary-green); color: white; border: none; border-radius: 6px; font-size: 10px; cursor: pointer;">View Full Leaderboard</button>
+                </div>
+            </div>
+        </div>
+        </div> <!-- End calculator tab -->
+
+        <div id="author-tab" class="tab-content">
+            <div class="panel" style="max-width: 800px; margin: 0 auto;">
+                <h2>About this Calculator</h2>
+                <div class="card">
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="font-size: 48px; margin-bottom: 15px;">🧮</div>
+                        <h3 style="color: var(--primary-green); margin-bottom: 10px;">Why this Calculator Matters</h3>
+                        <p style="color: var(--text-main); font-size: 14px; line-height: 1.6; margin-bottom: 15px;">
+                            This Digital Carbon Footprint Calculator is designed to help users understand the environmental impact of their everyday digital activities. Many people are unaware that actions like streaming, browsing, and cloud storage contribute to carbon emissions. 
+                            Unlike traditional carbon footprint calculators that focus on areas like transportation, energy use, and diet, this tool specifically measures the impact of digital behaviors, making it more relevant to modern technology use. This tool translates those activities into measurable CO₂ output, making an invisible impact visible.
+
+                        </p>
+                        <p style="color: var(--text-muted); font-size: 12px;">
+                            This calculator was created by Nick Rini using JavaScript for UH 4514. 
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="references-tab" class="tab-content">
+            <div class="panel" style="max-width: 1000px; margin: 0 auto;">
+                <h2>References & Sources</h2>
+                <div class="card">
+                    <div style="padding: 20px;">
+                        <h4 style="color: var(--primary-green); margin-bottom: 15px;">Data Sources & Methodology</h4>
+                        <div style="color: var(--text-muted); font-size: 13px; line-height: 1.6;">
+                            <p><strong>Carbon Emission Factors:</strong></p>
+                            <ul style="margin-bottom: 15px;">
+                                <li>U.S. Environmental Protection Agency. (2025). <em>Greenhouse gas equivalencies calculator</em>. https://www.epa.gov/energy/greenhouse-gas-equivalencies-calculator</li>
+                                <li>International Energy Agency. (2026). <em>Global energy review 2025</em>. https://www.iea.org/reports/global-energy-review-2025</li>
+                                <li>The Carbon Trust. (2021). <em>Carbon impact of video streaming</em> [White paper]. https://www.carbontrust.com/our-work-and-impact/guides-reports-and-tools/carbon-impact-of-video-streaming</li>
+                            </ul>
+                            
+                            <p><strong>Device Manufacturing Impact:</strong></p>
+                            <ul style="margin-bottom: 15px;">
+                                <li>Apple Inc. (2026). <em>2026 environmental progress report</em>. https://www.apple.com/environment/pdf/Apple_Environmental_Progress_Report_2026.pdf</li>
+                                <li>Lenovo Group Limited. (2025). <em>2024-2025 ESG annual report</em>. https://www.lenovo.com/us/en/about/sustainability/reports/</li>
+                                <li>Semiconductor Industry Association. (2025). <em>2025 state of the U.S. semiconductor industry</em>. https://www.semiconductors.org/resources/2025-state-of-the-industry-report/</li>
+                            </ul>
+                            
+                            <p><strong>Streaming & Data Center Impact:</strong></p>
+                            <ul style="margin-bottom: 15px;">
+                                <li>Netflix, Inc. (2025). <em>2024 environmental, social & governance report</em>. https://ir.netflix.net/governance/ESG/</li>
+                                <li>Amazon.com, Inc. (2025). <em>2024 sustainability report</em>. https://sustainability.aboutamazon.com/reports</li>
+                                <li>Google LLC. (2025). <em>Google 2025 environmental report</em>. https://sustainability.google/reports/google-2025-environmental-report/</li>
+                            </ul>
+                            
+                            <p><strong>Methodology:</strong></p>
+                            <ul style="margin-bottom: 20px;">
+                                <li>Intergovernmental Panel on Climate Change. (2019). <em>2019 refinement to the 2006 IPCC guidelines for national greenhouse gas inventories</em>. https://www.ipcc.ch/report/2019-refinement-to-the-2006-ipcc-guidelines-for-national-greenhouse-gas-inventories/</li>
+                                <li>Greenhouse Gas Protocol. (2004). <em>A corporate accounting and reporting standard</em> (Revised ed.). World Resources Institute; World Business Council for Sustainable Development. https://ghgprotocol.org/corporate-standard</li>
+                                <li>SustainableIT.org. (2025). <em>Digital sustainability: A framework for environmental and social impact</em>. https://www.sustainableit.org/resources/framework-2025</li>
+                            </ul>
+                            
+                            <h4 style="color: var(--primary-green); margin-bottom: 15px; margin-top: 25px;">Calculation Formulas</h4>
+                            <div style="background: rgba(92, 184, 92, 0.05); padding: 15px; border-radius: 8px; border-left: 3px solid var(--primary-green);">
+                                <p style="margin-bottom: 10px;"><strong>Total Annual CO₂ Emissions Formula:</strong></p>
+                                <div style="font-family: 'Courier New', monospace; background: var(--bg-color); padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 12px;">
+                                    Total = (Devices × 4.5) + (Daily Usage × Activity × 0.4) + (Quality × Streaming Hours × 0.35) + (Cloud Storage × 2.4) + (Emails × 1.5)
+                                </div>
+                                
+                                <p style="margin-bottom: 8px;"><strong>Component Breakdown:</strong></p>
+                                <ul style="font-size: 12px; line-height: 1.6;">
+                                    <li><strong>Device Manufacturing Impact:</strong> Devices × 4.5 kg CO₂/year<br>
+                                        <em>(Embodied carbon from device production and manufacturing)</em></li>
+                                    <li><strong>Daily Usage Impact:</strong> Daily Usage × Activity × 0.4 kg CO₂/year<br>
+                                        <em>(Electricity consumption from device operation)</em></li>
+                                    <li><strong>Streaming Impact:</strong> Quality × Streaming Hours × 0.35 kg CO₂/year<br>
+                                        <em>(Data center and network energy for streaming services)</em></li>
+                                    <li><strong>Cloud Storage Impact:</strong> Cloud Storage × 2.4 kg CO₂/year<br>
+                                        <em>(Data center energy for cloud storage and processing)</em></li>
+                                    <li><strong>Email Impact:</strong> Emails × 1.5 kg CO₂/year<br>
+                                        <em>(Server energy for email processing and storage)</em></li>
+                                </ul>
+                                
+                                <p style="margin-top: 15px; margin-bottom: 8px;"><strong>Driving Miles Equivalent:</strong></p>
+                                <div style="font-family: 'Courier New', monospace; background: var(--bg-color); padding: 8px; border-radius: 4px; font-size: 12px;">
+                                    Miles = Total CO₂ ÷ 0.404
+                                </div>
+                                <p style="font-size: 11px; color: var(--text-muted); margin-top: 5px;">
+                                    <em>(Based on EPA average of 0.404 kg CO₂ per mile driven by car)</em>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="leaderboardModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close-btn" onclick="closeLeaderboardModal()">&times;</span>
+            <div style="color: var(--primary-green); font-weight: 700; margin-bottom: 15px; font-size: 18px;">Digital Carbon Footprint Leaderboard</div>
+            <div style="margin-bottom: 15px;">
+                <input type="text" id="userName" placeholder="Enter your name" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--card-bg); color: var(--text-main); font-size: 12px;">
+                <button onclick="saveToLeaderboard()" style="margin-top: 8px; padding: 8px 16px; background: var(--primary-green); color: white; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; width: 100%;">Save My Results</button>
+            </div>
+            <div id="leaderboardList" style="max-height: 300px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <script>
+        let donutChartInstance = null;
+        let comparisonChartInstance = null;
+
+        // Theme Toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const toggle = document.getElementById('themeToggle');
+            const circle = toggle.querySelector('.theme-toggle-circle');
+            
+            if (html.classList.contains('light-mode')) {
+                html.classList.remove('light-mode');
+                toggle.classList.remove('light');
+                circle.textContent = '🌙';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                html.classList.add('light-mode');
+                toggle.classList.add('light');
+                circle.textContent = '☀️';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Load saved theme on page load
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const html = document.documentElement;
+            const toggle = document.getElementById('themeToggle');
+            const circle = toggle.querySelector('.theme-toggle-circle');
+            
+            if (savedTheme === 'light') {
+                html.classList.add('light-mode');
+                toggle.classList.add('light');
+                circle.textContent = '☀️';
+            }
+        }
+
+        loadTheme();
+
+        const infoContent = {
+            devices: { title: "Devices Owned", text: "Measures the embodied carbon from manufacturing your hardware. Producing a single laptop can generate hundreds of kilograms of CO2 before it is even turned on." },
+            usage: { title: "Daily Device Usage", text: "Tracks the direct electricity consumption of your local hardware and home networking infrastructure during your active daily sessions." },
+            activity: { title: "Internet Activity Type", text: "Different activities have different server loads. Online gaming and high end browsing require more data center processing than simple text based web pages." },
+            quality: { title: "Streaming Quality", text: "The resolution of your video significantly impacts data transfer. Streaming in 4K resolution can consume up to ten times the energy of Standard Definition streaming." },
+            streamHours: { title: "Streaming Volume", text: "Cumulative time spent pulling data from streaming servers. Continuous data transfer maintains a constant power draw on network hardware and server farms." },
+            cloud: { title: "Cloud Storage Usage", text: "Data centers must remain powered and cooled twenty four hours a day to keep your cloud files accessible. Larger storage volumes require more dedicated server space." },
+            emails: { title: "Daily Email Volume", text: "Each email requires processing and permanent storage. High volumes of messages with attachments contribute to the cumulative energy demand of email servers." }
+        };
+
+        function openModal(type) {
+            document.getElementById('modalTitle').innerText = infoContent[type].title;
+            document.getElementById('modalText').innerText = infoContent[type].text;
+            document.getElementById('infoModal').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('infoModal').style.display = 'none'; }
+
+        function calculateFootprint() {
+            const devices = parseFloat(document.getElementById('devices').value);
+            const dailyUsage = parseFloat(document.getElementById('dailyUsage').value);
+            const activity = parseFloat(document.getElementById('activity').value);
+            const quality = parseFloat(document.getElementById('quality').value);
+            const streamHrs = parseFloat(document.getElementById('streamHours').value);
+            const cloud = parseFloat(document.getElementById('cloud').value);
+            const emails = parseFloat(document.getElementById('emails').value);
+            
+            // Logic based on expanded categories
+            const deviceMfg = devices * 38;
+            const usage = dailyUsage * activity * 0.4;
+            const streaming = quality * streamHrs * 0.35;
+            const cloudImpact = cloud * 12;
+            const emailImpact = emails * 1.5;
+
+            const total = deviceMfg + usage + streaming + cloudImpact + emailImpact;
+            document.getElementById('totalNumber').innerText = total.toFixed(1);
+            
+            // Convert to driving miles (EPA average: 0.404 kg CO2 per mile)
+            const milesEquivalent = Math.round(total / 0.404);
+            document.getElementById('drivingMiles').innerText = milesEquivalent.toLocaleString();
+            
+            updateInsights(total, {deviceMfg, usage, streaming, quality});
+            updateDonutChart([streaming, deviceMfg, cloudImpact, emailImpact, usage]);
+            updateComparisonChart(total);
+        }
+
+        function updateInsights(total, data) {
+            const totalIns = document.getElementById('totalInsight');
+            const totalImp = document.getElementById('totalImprove');
+            const breakIns = document.getElementById('breakdownInsight');
+            const breakImp = document.getElementById('breakdownImprove');
+            const compIns = document.getElementById('compareInsight');
+
+            if (total > 100) {
+                totalIns.innerText = "The current usage pattern suggests a digital footprint that is higher than the sustainability target.";
+                totalImp.innerText = "Focus on reducing the number of high resolution streaming hours and consolidating cloud storage files.";
+            } else {
+                totalIns.innerText = "Your digital habits are currently efficient and fall within the sustainability target zone.";
+                totalImp.innerText = "Continue maintaining your current equipment rather than upgrading and stay with standard video settings.";
+            }
+
+            if (data.streaming > data.deviceMfg) {
+                breakIns.innerText = "Streaming and online data transfer represent the largest portion of your annual carbon impact.";
+                breakImp.innerText = data.quality > 1 ? "Lowering your default playback resolution from 4K or HD to SD can cut streaming energy use in half." : "Reducing total weekly viewing hours would be the most effective way to lower this category.";
+            } else {
+                breakIns.innerText = "Hardware manufacturing costs from your tech inventory are the primary driver of your score.";
+                breakImp.innerText = "Extending the life of your smartphone and laptop by even one year significantly lowers your annual impact.";
+            }
+
+            const avg = 200.0;
+            const diff = Math.abs(((total - avg) / avg) * 100).toFixed(0);
+            compIns.innerText = total > avg 
+                ? `You are currently ${diff}% above the average user benchmark. Small habit shifts could move you below the average.`
+                : `You are performing ${diff}% better than the average user benchmark. Your digital profile is highly optimized.`;
+        }
+
+        function updateDonutChart(vals) {
+            const ctx = document.getElementById('donutChart').getContext('2d');
+            if (donutChartInstance) donutChartInstance.destroy();
+            const total = vals.reduce((a, b) => a + b, 0);
+            
+            // Create gradients for each slice
+            const colors = ['#5cb85c', '#36a2eb', '#f0ad4e', '#d9534f', '#a65628'];
+            const gradients = colors.map(color => {
+                const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+                // Lighten the color for gradient
+                gradient.addColorStop(0, color);
+                gradient.addColorStop(1, adjustBrightness(color, 1.3));
+                return gradient;
+            });
+            
+            donutChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Streaming', 'Hardware', 'Cloud', 'Messages', 'Usage'],
+                    datasets: [{
+                        data: vals,
+                        backgroundColor: gradients,
+                        borderWidth: 0, hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { position: 'right', labels: { color: '#94a3b8', boxWidth: 8, font: { size: 9 } } },
+                        title: { display: true, text: 'Your DCF Breakdown by Category', color: '#94a3b8', font: { size: 19, weight: 'bold' } },
+                        tooltip: { callbacks: { label: function(context) { const percentage = ((context.parsed / total) * 100).toFixed(1); return context.label + ': ' + percentage + '%'; } } }
+                    },
+                    cutout: 0
+                }
+            });
+        }
+        
+        // Helper function to adjust brightness of colors
+        function adjustBrightness(color, factor) {
+            const hex = color.replace('#', '');
+            const num = parseInt(hex, 16);
+            const r = Math.min(255, Math.round((num >> 16) * factor));
+            const g = Math.min(255, Math.round(((num >> 8) & 0x00FF) * factor));
+            const b = Math.min(255, Math.round((num & 0x0000FF) * factor));
+            return '#' + (0x1000000 + r * 0x10000 + g * 0x100 + b).toString(16).slice(1);
+        }
+
+        function updateComparisonChart(userTotal) {
+            const ctx = document.getElementById('comparisonChart').getContext('2d');
+            if (comparisonChartInstance) comparisonChartInstance.destroy();
+            comparisonChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['You', 'US Average', 'Target'],
+                    datasets: [{
+                        data: [userTotal.toFixed(1), 200, 100],
+                        backgroundColor: ['#5cb85c', '#36a2eb', '#475569'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: false },
+                        title: { display: true, text: 'Comparing your CO2 Emissions', color: '#94a3b8', font: { size: 19, weight: 'bold' } },
+                        tooltip: { callbacks: { label: function(context) { return context.label + ': ' + context.parsed.y + ' kg/yr'; } } }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b', font: { size: 10 }, callback: function(value) { return value + ' kg/yr'; } } },
+                        x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        // Leaderboard Functions
+        function openLeaderboardModal() {
+            loadLeaderboard();
+            document.getElementById('leaderboardModal').style.display = 'flex';
+        }
+
+        function closeLeaderboardModal() {
+            document.getElementById('leaderboardModal').style.display = 'none';
+        }
+
+        // QR Code Functions
+        function openQRModal() {
+            const qrContainer = document.getElementById('qrCodeContainer');
+            
+            // Get current page URL
+            let pageUrl = window.location.href;
+            
+            // Check if it's a local file
+            if (pageUrl.startsWith('file://')) {
+                // Prompt user for the public URL where this will be hosted
+                const publicUrl = prompt('Enter the public URL where this calculator is hosted (e.g., https://example.com/calculator.html):', 'https://');
+                if (publicUrl && publicUrl !== 'https://') {
+                    pageUrl = publicUrl;
+                } else {
+                    qrContainer.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Please provide a public URL to generate a shareable QR code. Upload this file to a web server first.</p>';
+                    document.getElementById('qrModal').style.display = 'flex';
+                    return;
+                }
+            }
+            
+            // Encode URL for QR code API
+            const encodedUrl = encodeURIComponent(pageUrl);
+            
+            // Use QR Server API to generate QR code
+            const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodedUrl}`;
+            
+            // Create and display the QR code image
+            qrContainer.innerHTML = `<img src="${qrImageUrl}" alt="QR Code" style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">`;
+            
+            // Show the modal
+            document.getElementById('qrModal').style.display = 'flex';
+        }
+
+        function closeQRModal() {
+            document.getElementById('qrModal').style.display = 'none';
+        }
+
+        // Tab Functions
+        function showTab(tabName) {
+            // Hide all tab content
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            // Remove active class from all tab buttons
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => button.classList.remove('active'));
+
+            // Show selected tab content
+            document.getElementById(tabName + '-tab').classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        function saveToLeaderboard() {
+            const name = document.getElementById('userName').value.trim();
+            if (!name) {
+                alert('Please enter your name');
+                return;
+            }
+
+            const total = parseFloat(document.getElementById('totalNumber').innerText);
+            if (total === 0) {
+                alert('Please calculate your footprint first');
+                return;
+            }
+
+            const leaderboard = JSON.parse(localStorage.getItem('dcfLeaderboard') || '[]');
+            leaderboard.push({
+                name: name,
+                emissions: total,
+                date: new Date().toISOString()
+            });
+
+            // Sort by emissions (lowest first)
+            leaderboard.sort((a, b) => a.emissions - b.emissions);
+
+            localStorage.setItem('dcfLeaderboard', JSON.stringify(leaderboard));
+            document.getElementById('userName').value = '';
+            loadLeaderboard();
+            updateLeaderboardPreview();
+            alert('Results saved to leaderboard!');
+        }
+
+        function loadLeaderboard() {
+            const leaderboard = JSON.parse(localStorage.getItem('dcfLeaderboard') || '[]');
+            const list = document.getElementById('leaderboardList');
+
+            if (leaderboard.length === 0) {
+                list.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 20px;">No entries yet. Be the first!</div>';
+                return;
+            }
+
+            list.innerHTML = leaderboard.map((entry, index) => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-weight: bold; color: var(--primary-green); min-width: 20px;">#${index + 1}</span>
+                        <span style="color: var(--text-main);">${entry.name}</span>
+                    </div>
+                    <span style="color: var(--text-muted); font-size: 11px;">${entry.emissions.toFixed(1)} kg/yr</span>
+                </div>
+            `).join('');
+        }
+
+        function updateLeaderboardPreview() {
+            const leaderboard = JSON.parse(localStorage.getItem('dcfLeaderboard') || '[]');
+            const preview = document.getElementById('leaderboardPreview');
+
+            if (leaderboard.length === 0) {
+                preview.innerHTML = 'No entries yet';
+                return;
+            }
+
+            const top3 = leaderboard.slice(0, 3);
+            preview.innerHTML = top3.map((entry, index) => 
+                `<div style="margin-bottom: 4px;">${index + 1}. ${entry.name} - ${entry.emissions.toFixed(1)} kg/yr</div>`
+            ).join('');
+        }
+
+        window.onload = function() {
+            calculateFootprint();
+            updateLeaderboardPreview();
+            
+            // Handle theme toggle and share button visibility on scroll
+            const themeToggle = document.getElementById('themeToggle');
+            const shareButton = document.getElementById('shareButton');
+            
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 100) {
+                    themeToggle.classList.add('hidden');
+                    shareButton.classList.add('hidden');
+                } else {
+                    themeToggle.classList.remove('hidden');
+                    shareButton.classList.remove('hidden');
+                }
+            });
+        };
+    </script>
+</body>
+</html>
