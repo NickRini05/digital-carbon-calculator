@@ -45,7 +45,7 @@ The results are broken down by category and converted into real-world equivalent
 
 ## Live Demo
 
-https://yourusername.github.io/your-repo-name/
+[https://yourusername.github.io/your-repo-name/](https://nickrini05.github.io/digital-carbon-calculator/)
 
 ---
 
